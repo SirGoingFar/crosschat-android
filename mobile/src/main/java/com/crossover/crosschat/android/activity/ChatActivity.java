@@ -162,14 +162,14 @@ public class ChatActivity extends BasicActivity implements ChatView {
 
         messageEditText.setText("");
         messageEditText.clearFocus();
-        InputUtils.hideKeyboard();
+        InputUtils.hideKeyboard(this);
     }
 
     @Override
     public void onBackPressed() {
         if (messageEditText.hasFocus()) {
             messageEditText.clearFocus();
-            InputUtils.hideKeyboard();
+            InputUtils.hideKeyboard(this);
             return;
         }
 

@@ -16,13 +16,9 @@ public class InputUtils {
 
     public static final String TAG = InputUtils.class.getSimpleName();
 
-    public static Context context;
-
     public static void showKeyboard(Activity activity, EditText editText) {
         if (activity == null || editText == null)
             return;
-
-        context = activity;
 
         try {
             InputMethodManager inputManager =
@@ -33,7 +29,7 @@ public class InputUtils {
         }
     }
 
-    public static void hideKeyboard() {
+    public static void hideKeyboard(Context context) {
         if (context == null || !(context instanceof Activity))
             return;
 

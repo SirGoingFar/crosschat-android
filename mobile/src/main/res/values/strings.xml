@@ -13,4 +13,6 @@
 
     <!-- Buttons Strings -->
     <string name="btn_start">LET\'S START</string>
+    <string name="btn_submit">btn_submit</string>
+    <string name="crosschat_logo">crosschat_logo</string>
 </resources>
