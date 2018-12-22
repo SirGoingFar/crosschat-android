@@ -7,8 +7,8 @@ import org.junit.Test;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Mahmoud Abdurrahman (mahmoud.abdurrahman@crossover.com) on 2/8/18.
@@ -250,5 +250,25 @@ public class ContentRegexTests {
                         + sample + "'",
                 expectedCount,
                 pattern.matcher(sample).groupCount());
+    }
+
+    @Test
+    public void testHashtagsRegex() {
+        assertCaptureCount(3, ContentRegex.VALID_HASHTAG, "#crossoverchat");
+    }
+
+    @Test
+    public void testExtractHashtags() {
+        assertCaptureCount(3, ContentRegex.VALID_HASHTAG,
+                "sample #hashtag");
+    }
+
+    @Test
+    public void testInvalidHashtags() {
+        char[] invalidChars = new char[]{'!', '@', '#', '$', '%', '&', '*'};
+        for (char c : invalidChars) {
+            assertFalse("Failed to ignore a hashtag preceded by " + c,
+                    ContentRegex.VALID_HASHTAG.matcher("f" + c + "#kn").find());
+        }
     }
 }

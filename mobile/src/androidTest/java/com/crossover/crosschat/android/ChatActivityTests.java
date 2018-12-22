@@ -7,21 +7,26 @@ import android.test.suitebuilder.annotation.LargeTest;
 
 import com.crossover.crosschat.android.activity.ChatActivity;
 
-import static android.support.test.espresso.Espresso.onView;
-
-import static android.support.test.espresso.action.ViewActions.*;
-import static android.support.test.espresso.assertion.ViewAssertions.*;
-import static android.support.test.espresso.matcher.ViewMatchers.*;
-
-import static org.hamcrest.Matchers.*;
-
-import static com.crossover.crosschat.android.utils.CustomMatchers.*;
-import static com.crossover.crosschat.android.utils.OrientationChangeAction.*;
-import static com.crossover.crosschat.android.utils.WaitUtils.*;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.typeText;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static com.crossover.crosschat.android.utils.CustomMatchers.nthChildOf;
+import static com.crossover.crosschat.android.utils.OrientationChangeAction.orientationLandscape;
+import static com.crossover.crosschat.android.utils.OrientationChangeAction.orientationPortrait;
+import static com.crossover.crosschat.android.utils.WaitUtils.cleanupWaitTime;
+import static com.crossover.crosschat.android.utils.WaitUtils.waitTime;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * Created by Mahmoud Abdurrahman (mahmoud.abdurrahman@crossover.com) on 2/12/18.
@@ -211,6 +216,63 @@ public class ChatActivityTests {
         onView(
                 allOf(nthChildOf(withId(R.id.recycler), 0),
                         hasDescendant(withText("@bob @john (success) such a cool feature; " +
+                                "https://twitter.com/jdorfman/status/430511497475670016")))
+        ).check(matches(isDisplayed()));
+
+        // Clean up
+        // ----------------------
+        cleanupWaitTime();
+    }
+
+    @Test
+    public void testHashTagProcessing() {
+
+        // Start Activity with Custom Intent
+        // ----------------------
+        startActivityWithCustomIntent();
+
+        // Now we wait some time
+        // ----------------------
+        waitTime();
+
+        // Write a Message with different entities
+        // ----------------------
+        onView(withId(R.id.edit_message))
+                .perform(typeText("@bob @john (success) #hashtag such a cool feature; " +
+                        "https://twitter.com/jdorfman/status/430511497475670016"));
+
+        // Tap "Submit" button to send Message
+        // ----------------------
+        onView(withId(R.id.btn_submit)).perform(click());
+
+        // Check if the user Message is added to Chat view
+        // ----------------------
+        onView(
+                allOf(nthChildOf(withId(R.id.recycler), 0),
+                        hasDescendant(withText("@bob @john (success) #hashtag such a cool feature; " +
+                                "https://twitter.com/jdorfman/status/430511497475670016")))
+        ).check(matches(isDisplayed()));
+
+        // Now we wait some time
+        // ----------------------
+        waitTime();
+
+        // Check if a reply was added and contains a JSON text describing all the findings
+        // ----------------------
+        onView(
+                allOf(nthChildOf(withId(R.id.recycler), 1),
+                        hasDescendant(withText("{\"emoticons\":[\"success\"],\"hashtags\":[\"hashtag\"],\"links\":" +
+                                "[\"https://twitter.com/jdorfman/status/430511497475670016\"]," +
+                                "\"mentions\":[\"bob\",\"john\"]}")))
+        ).check(matches(isDisplayed()));
+
+        // Moreover, check if a reply with the same original Message is added, and expected to be
+        // formatted
+        // TODO: Check if the Message were properly formatted as expected
+        // ----------------------
+        onView(
+                allOf(nthChildOf(withId(R.id.recycler), 0),
+                        hasDescendant(withText("@bob @john (success) #hashtag such a cool feature; " +
                                 "https://twitter.com/jdorfman/status/430511497475670016")))
         ).check(matches(isDisplayed()));
 

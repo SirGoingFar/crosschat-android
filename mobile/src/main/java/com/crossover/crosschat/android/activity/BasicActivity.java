@@ -34,11 +34,13 @@ public abstract class BasicActivity extends MvpAppCompatActivity {
             onLaunch();
         }
 
-        if (toolbar != null) {
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+
+        if (toolbar != null && actionBar != null) {
             setSupportActionBar(toolbar);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowTitleEnabled(true);
-            getSupportActionBar().setTitle(getToolbarTitle());
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setTitle(getToolbarTitle());
         }
     }
 

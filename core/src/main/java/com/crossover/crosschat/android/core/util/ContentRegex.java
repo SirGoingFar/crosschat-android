@@ -222,7 +222,7 @@ public class ContentRegex {
 
             VALID_DOMAIN = Pattern.compile(URL_VALID_DOMAIN, Pattern.CASE_INSENSITIVE);
 
-            VALID_HASHTAG = Pattern.compile("([^a-z0-9_!#$%&*" + HASH_SIGN_CHARS
+            VALID_HASHTAG = Pattern.compile("([^a-z0-9_!@$%&*" + HASH_SIGN_CHARS
                             + "]|^|(?:^|[^a-z0-9_+~.-])RT:?)(" + HASH_SIGN_CHARS + "+)([a-z0-9_]*)?",
                     Pattern.CASE_INSENSITIVE);
         }

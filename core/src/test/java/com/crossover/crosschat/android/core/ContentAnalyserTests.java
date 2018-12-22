@@ -9,11 +9,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Created by Mahmoud Abdurrahman (mahmoud.abdurrahman@crossover.com) on 2/8/18.
@@ -23,6 +23,7 @@ import java.util.List;
         ContentAnalyserTests.MentionsTest.class,
         ContentAnalyserTests.EmoticonsTest.class,
         ContentAnalyserTests.URLsTest.class,
+        ContentAnalyserTests.HashtagsTest.class,
         ContentAnalyserTests.AdvancedEntitiesTest.class
 })
 public class ContentAnalyserTests {
@@ -75,7 +76,7 @@ public class ContentAnalyserTests {
 
         @Test
         public void testInvalidMention() {
-            List<String> extracted = analyser.extractMentions("@ invalid mention.");
+            List<String> extracted = analyser.extractHashtags("@ invalid mention.");
 
             assertEmptyList("Extracted an invalid mention: " + extracted, extracted);
         }
@@ -140,7 +141,7 @@ public class ContentAnalyserTests {
             );
 
             assertList("Extracted invalid emoticons: " + extracted,
-                    new String[]{"a", "crossover"}, extracted);
+                    new String[]{"a", "challengeaccepted", "crossover"}, extracted);
         }
 
         @Test
@@ -159,6 +160,83 @@ public class ContentAnalyserTests {
         }
 
     }
+
+
+    /**
+     * Tests for the extractHashtags{WithIndices} methods
+     */
+    public static class HashtagsTest {
+
+        @Test
+        public void testHashtagAtTheBeginning() {
+            List<String> extracted = analyser.extractHashtags("#crossover chat test");
+
+            assertList("Failed to extract hashtag at the beginning",
+                    new String[]{"crossover"}, extracted);
+        }
+
+        @Test
+        public void testHashtagWithLeadingSpace() {
+            List<String> extracted = analyser.extractHashtags(" #crossover chat test");
+
+            assertList("Failed to extract hashtag with leading space",
+                    new String[]{"crossover"}, extracted);
+        }
+
+        @Test
+        public void testHashtagInMidText() {
+            List<String> extracted = analyser.extractHashtags("chat #crossover test");
+
+            assertList("Failed to extract hashtag in mid text",
+                    new String[]{"crossover"}, extracted);
+        }
+
+        @Test
+        public void testMultipleHashtags() {
+            List<String> extracted = analyser.extractHashtags(
+                    "mention #hash here and #tag here"
+            );
+
+            assertList("Failed to extract multiple mentioned users",
+                    new String[]{"hash", "tag"}, extracted);
+        }
+
+        @Test
+        public void testInvalidHashtag() {
+            List<String> extracted = analyser.extractMentions("# invalid hashtag.");
+
+            assertEmptyList("Extracted an invalid hashtag: " + extracted, extracted);
+        }
+
+        @Test
+        public void testHashtagWithIndices() {
+            List<ContentEntity> extracted = analyser.extractHashtagsWithIndices(
+                    " #user1 mention #user2 here #user3 "
+            );
+            assertEquals(extracted.size(), 3);
+            assertEquals(extracted.get(0).getStart(), 1);
+            assertEquals(extracted.get(0).getEnd(), 7);
+            assertEquals(extracted.get(1).getStart(), 16);
+            assertEquals(extracted.get(1).getEnd(), 22);
+            assertEquals(extracted.get(2).getStart(), 28);
+            assertEquals(extracted.get(2).getEnd(), 34);
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Tests for the extractURLs{WithIndices} methods
@@ -257,7 +335,7 @@ public class ContentAnalyserTests {
             );
 
             assertList("Failed to extract URL overlapping both mention and emoticon",
-                    new String[]{"http://example.com/test_(test)/@dave"}, extracted);
+                    new String[]{"http://example.com/test_(test)/@dave", "dave"}, extracted);
         }
 
         @Test
